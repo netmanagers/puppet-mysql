@@ -6,8 +6,8 @@
 class mysql::password {
 
   # Load the variables used in this module. Check the params.pp file
-  require mysql
-  require mysql::params
+  include mysql
+  include mysql::params
 
   if ! defined(File['/root/.my.cnf']) {
     file { '/root/.my.cnf':
@@ -16,7 +16,7 @@ class mysql::password {
       mode    => '0400',
       owner   => $mysql::config_file_owner,
       group   => $mysql::config_file_group,
-      content => template('mysql/root.my.cnf.erb'),
+      content => template($mysql::root_cnf_template),
       # replace => false,
       # require => Exec['mysql_root_password'],
     }
@@ -35,11 +35,11 @@ class mysql::password {
   }
 
   exec { 'mysql_backup_root_my_cnf':
-    require     => Service['mysql'],
-    path        => '/bin:/sbin:/usr/bin:/usr/sbin',
-    unless      => 'diff /root/.my.cnf /root/.my.cnf.backup',
-    command     => 'cp /root/.my.cnf /root/.my.cnf.backup ; true',
-    before      => File['/root/.my.cnf'],
+    require => Service['mysql'],
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    unless  => 'diff /root/.my.cnf /root/.my.cnf.backup',
+    command => 'cp /root/.my.cnf /root/.my.cnf.backup ; true',
+    before  => File['/root/.my.cnf'],
   }
 
 
