@@ -188,6 +188,10 @@
 # [*pid_file*]
 #   Path of pid file. Used by monitor
 #
+# [*socket*]
+#   Path to the mysql socket file.  If set, will appear in .my.cnf
+#   Remember to duplicate in the server configuration.
+#
 # [*data_dir*]
 #   Path of application data directory. Used by puppi
 #
@@ -261,6 +265,7 @@ class mysql (
   $config_file_group   = params_lookup( 'config_file_group' ),
   $config_file_init    = params_lookup( 'config_file_init' ),
   $pid_file            = params_lookup( 'pid_file' ),
+  $socket              = params_lookup( 'socket' ),
   $data_dir            = params_lookup( 'data_dir' ),
   $log_dir             = params_lookup( 'log_dir' ),
   $log_file            = params_lookup( 'log_file' ),
@@ -423,7 +428,7 @@ class mysql (
   }
 
   # The whole mysql configuration directory can be recursively overriden
-  if $mysql::source_dir {
+  if $mysql::source_dir and $mysql::source_dir != '' {
     file { 'mysql.dir':
       ensure  => directory,
       path    => $mysql::config_dir,
@@ -439,7 +444,7 @@ class mysql (
 
 
   ### Include custom class if $my_class is set
-  if $mysql::my_class {
+  if $mysql::my_class and $mysql::my_class != '' {
     include $mysql::my_class
   }
 
